@@ -20,6 +20,7 @@ let rafId = null;
 let sweepDisplayDeg = 0;
 let sweepVelocity = 0;
 let lastSweepTs = 0;
+let audioCtx = null;
 
 function buildDialMarks() {
   tickRing.innerHTML = '';
@@ -116,8 +117,43 @@ function loop(ts) {
   rafId = requestAnimationFrame(loop);
 }
 
+function initAudio() {
+  if (!audioCtx && 'AudioContext' in window) {
+    audioCtx = new AudioContext();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+}
+
+function playEndSound() {
+  if (!audioCtx) return;
+
+  const now = audioCtx.currentTime + 0.02;
+  const gain = audioCtx.createGain();
+  gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(0.0001, now);
+
+  const frequencies = [880, 988, 1047];
+  frequencies.forEach((freq, index) => {
+    const osc = audioCtx.createOscillator();
+    const start = now + index * 0.16;
+    const end = start + 0.12;
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, start);
+    osc.connect(gain);
+    osc.start(start);
+    osc.stop(end);
+  });
+
+  gain.gain.exponentialRampToValueAtTime(0.12, now + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + frequencies.length * 0.16 + 0.04);
+}
+
 function startTimer() {
   if (running || remainingMs <= 0) return;
+  initAudio();
   running = true;
   startPauseBtn.textContent = 'Pause';
   startPauseBtn.classList.add('is-live');
@@ -138,6 +174,7 @@ function pauseTimer() {
 function stopTimer(completed = false) {
   pauseTimer();
   if (completed) {
+    playEndSound();
     startPauseBtn.textContent = 'Start';
     startPauseBtn.classList.remove('is-live');
     window.setTimeout(() => {
