@@ -21,6 +21,8 @@ let sweepDisplayDeg = 0;
 let sweepVelocity = 0;
 let lastSweepTs = 0;
 let audioCtx = null;
+const BELL_SOUND_SRC = 'assets/bell.mp3';
+let bellAudio = null;
 
 function buildDialMarks() {
   tickRing.innerHTML = '';
@@ -124,9 +126,26 @@ function initAudio() {
   if (audioCtx && audioCtx.state === 'suspended') {
     audioCtx.resume().catch(() => {});
   }
+
+  if (!bellAudio) {
+    bellAudio = new Audio(BELL_SOUND_SRC);
+    bellAudio.preload = 'auto';
+  }
 }
 
 function playEndSound() {
+  if (bellAudio) {
+    bellAudio.currentTime = 0;
+    bellAudio.play().catch(() => {
+      playFallbackEndSound();
+    });
+    return;
+  }
+
+  playFallbackEndSound();
+}
+
+function playFallbackEndSound() {
   if (!audioCtx) return;
 
   const now = audioCtx.currentTime + 0.02;
@@ -175,11 +194,7 @@ function stopTimer(completed = false) {
   pauseTimer();
   if (completed) {
     playEndSound();
-    startPauseBtn.textContent = 'Start';
-    startPauseBtn.classList.remove('is-live');
-    window.setTimeout(() => {
-      alert('Session complete. Great work.');
-    }, 120);
+    resetTimer();
   }
 }
 
