@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pomodoro Physical Timer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="timer-card" aria-label="Pomodoro Timer">
+      <header class="panel-head">
+        <h1>Pomodoro Timer</h1>
+        <p>Physical sweep style focus clock</p>
+      </header>
+
+      <div class="dial-wrap">
+        <div class="dial-face" id="dialFace" role="img" aria-label="Analog countdown clock">
+          <div class="tick-ring" id="tickRing"></div>
+          <div class="number-ring" id="numberRing"></div>
+          <div class="progress-sweep" id="progressSweep"></div>
+          <div class="center-cap"></div>
+          <div class="digital-readout" id="digitalReadout">25:00</div>
+        </div>
+      </div>
+
+      <div class="preset-row" role="group" aria-label="Duration presets">
+        <button class="preset-btn active" data-minutes="25">25 min</button>
+        <button class="preset-btn" data-minutes="30">30 min</button>
+        <button class="preset-btn" data-minutes="45">45 min</button>
+        <button class="preset-btn" data-minutes="60">60 min</button>
+      </div>
+
+      <div class="control-row">
+        <button id="startPauseBtn" class="control-btn primary">Start</button>
+        <button id="resetBtn" class="control-btn">Reset</button>
+      </div>
+    </section>
+
+    <section class="tasks-card" aria-label="Task List">
+      <header class="panel-head">
+        <h2>Tasks</h2>
+        <p>Add what you want to finish in this session</p>
+      </header>
+
+      <form id="taskForm" class="task-form">
+        <label for="taskInput" class="sr-only">Add task</label>
+        <input id="taskInput" type="text" maxlength="120" placeholder="Write a task and press Add" required />
+        <button type="submit" class="control-btn primary">Add</button>
+      </form>
+
+      <ul id="taskList" class="task-list" aria-live="polite"></ul>
+    </section>
+  </main>
+
+  <script src="logic.js"></script>
+
+
+
+</body>
+</html>
